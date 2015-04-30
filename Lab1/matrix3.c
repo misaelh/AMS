@@ -34,7 +34,6 @@ void matrix_mult_sq(int size, double *vector_in,
     }
 }
 
-
 void matrix_mult_pl(int size, double *vector_in,
 		       double *matrix_in, double *vector_out){
   int rows, cols;
@@ -100,7 +99,8 @@ void matrix_mult_avx2(int size, double *vector_in,
         in2 = _mm256_set_pd(matrix_in[cols+(j+3)*size],matrix_in[cols+(j+2)*size],matrix_in[cols+(j+1)*size],matrix_in[cols+(j)*size]);
 	//printf("Index2: %d",cols+(j)*size);
 
-	out = _mm256_add_pd(_mm256_mul_pd(in1, in2), out);
+	//out = _mm256_add_pd(_mm256_mul_pd(in1, in2), out);
+	out = _mm256_fmadd_pd(in1, in2, out);
 
       }
       //printf("\n");
@@ -142,47 +142,48 @@ int main(int argc, char *argv[]){
   double *matrix = (double *)malloc(sizeof(double)*size*size);
   double *result_sq = (double *)malloc(sizeof(double)*size*size);
   double *result_pl = (double *)malloc(sizeof(double)*size*size);
-  double time_sq = 0;
-  double time_pl = 0;
-  matrix_vector_gen(size, matrix, vector, result_sq);
+  double *result_avx = (double *)malloc(sizeof(double)*size*size);
+  double time_sq = 0, time_pl = 0, time_avx = 0;
   
-
+  matrix_vector_gen(size, matrix, vector, result_sq);
     
   time_sq = omp_get_wtime();
-  //matrix_mult_sq(size, vector, matrix, result_sq);
-  matrix_mult_avx2(size, vector, matrix, result_sq);
+  matrix_mult_sq(size, vector, matrix, result_sq);
   time_sq = omp_get_wtime() - time_sq;
   
   time_pl = omp_get_wtime();
   matrix_mult_pl(size, vector, matrix, result_pl);
-  //matrix_mult_sq(size, vector, matrix, result_pl);
   time_pl = omp_get_wtime() - time_pl;
-
-  printf("SEQUENTIAL EXECUTION: %f (sec)\n", time_sq);
-  printf("PARALLEL EXECUTION WITH %d (threads) ON %d (processors): %f (sec)\n",
-	 omp_get_max_threads(), omp_get_num_procs(), time_pl);
-
   
+  time_avx = omp_get_wtime();
+  matrix_mult_avx2(size, vector, matrix, result_avx);
+  time_avx = omp_get_wtime() - time_avx;
+  
+  printf("AVX + MULTI-THREADED EXECUTION: %f (sec)\n", time_avx); // 8 640 - 0.445056
+  printf("PARALLEL EXECUTION WITH %d (threads) ON %d (processors): %f (sec)\n",
+	 omp_get_max_threads(), omp_get_num_procs(), time_pl); // 8 640 - 0.618194
+
   //check
   int i;
   for(i=0; i<size*size; i++)
-    if(result_sq[i] != result_pl[i]){
-      printf("MP: %f AV: %f\n", result_pl[i], result_sq[i]);
+    if(result_avx[i] != result_sq[i]){
+      printf("SEQ: %f AV: %f\n", result_sq[i], result_avx[i]);
       printf("wrong at position %d\n", i);
       return 0;
       }
   
-  printf("\nout");
+
   for(rows=0; rows<1; rows++){
     printf("\n");
     for(cols=0; cols<1; cols++)
-      printf("%.1f ", result_sq[rows*size+cols]);
+      printf("%.1f ", result_avx[rows*size+cols]);
   }
 
-
+  printf("\nDone");
   free(vector);
   free(matrix);
   free(result_sq);
   free(result_pl);
+  free(result_avx);
   return 1;
 }
