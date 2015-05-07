@@ -11,8 +11,8 @@ and a "size x size" matrix
 void matrix_vector_gen(int size, double *matrix, double *matrix2, double *result_sq){
   int i;
   for(i=0; i<size*size; i++){
-    matrix[i] = i+1;//((double)rand())/5307.0;
-    matrix2[i] = i+1;//((double)rand())/5307.0;
+    matrix[i] = ((double)rand())/5307.0;
+    matrix2[i] = ((double)rand())/5307.0;
     result_sq[i] = 0.0;
   }
 }
@@ -50,32 +50,6 @@ void matrix_mult_pl(int size, double *vector_in,
     }
 }
 
-void matrix_mult_avx(int size, double *vector_in,
-		       double *matrix_in, double *vector_out){
-  int rows, cols;
-  int j;
-  __m256d in1,in2,out;
-  
-# pragma omp parallel					\
-  shared(size, vector_in, matrix_in, vector_out)	\
-  private(rows, cols, j,in1,in2,out)
-# pragma omp for
-  
-  for(cols=0; cols<size; cols++)
-    for(rows=0; rows<size; rows++){
-      vector_out[rows*size + cols] = 0.0;
-      out = _mm256_set1_pd(0.0);
-      for(j=0; j<size; j+=4){
-	in1 = _mm256_loadu_pd(&vector_in[rows*size+j]);
-        in2 = _mm256_set1_pd(matrix_in[cols+j*size]);
-
-	out = _mm256_add_pd(_mm256_mul_pd(in1, in2), out);
-
-      }
-      _mm256_storeu_pd(&vector_out[rows*size + cols], out); 
-    }
-}
-
 void matrix_mult_avx2(int size, double *vector_in,
 		       double *matrix_in, double *vector_out){
   int rows, cols;
@@ -94,18 +68,12 @@ void matrix_mult_avx2(int size, double *vector_in,
       out = _mm256_set1_pd(0.0);
       for(j=0; j<size; j+=4){
 	in1 = _mm256_loadu_pd(&vector_in[rows*size+j]);
-	//printf("Row / Col: %d, %d",rows, cols);
-	//printf("Index1: %d",rows*size+j);
         in2 = _mm256_set_pd(matrix_in[cols+(j+3)*size],matrix_in[cols+(j+2)*size],matrix_in[cols+(j+1)*size],matrix_in[cols+(j)*size]);
-	//printf("Index2: %d",cols+(j)*size);
 
-	//out = _mm256_add_pd(_mm256_mul_pd(in1, in2), out);
 	out = _mm256_fmadd_pd(in1, in2, out);
 
       }
-      //printf("\n");
       _mm256_storeu_pd(result, out);
-      //printf("%f , %f, %f, %f\n",result[0],result[1],result[2],result[3]);
       vector_out[rows*size + cols] = result[0]+result[1]+result[2]+result[3];
     }
 }
@@ -116,16 +84,16 @@ void mmul_sse(const double * a, const double * b, double * r)
   __m256d a_line, b_line, r_line;
   for (i=0; i<16; i+=4) {
     // unroll the first step of the loop to avoid having to initialize r_line to zero
-    a_line = _mm256_loadu_pd(a);         // a_line = vec4(column(a, 0))
-    b_line = _mm256_set1_pd(b[i]);      // b_line = vec4(b[i][0])
-    r_line = _mm256_mul_pd(a_line, b_line); // r_line = a_line * b_line
+    a_line = _mm256_loadu_pd(a);
+    b_line = _mm256_set1_pd(b[i]);
+    r_line = _mm256_mul_pd(a_line, b_line); 
     for (j=1; j<4; j++) {
-      a_line = _mm256_loadu_pd(&a[j*4]); // a_line = vec4(column(a, j))
-      b_line = _mm256_set1_pd(b[i+j]);  // b_line = vec4(b[i][j])
-                                     // r_line += a_line * b_line
+      a_line = _mm256_loadu_pd(&a[j*4]); 
+      b_line = _mm256_set1_pd(b[i+j]);  
+                                
       r_line = _mm256_add_pd(_mm256_mul_pd(a_line, b_line), r_line);
     }
-    _mm256_storeu_pd(&r[i], r_line);     // r[i] = r_line
+    _mm256_storeu_pd(&r[i], r_line);
   }
 }
 
@@ -162,6 +130,7 @@ int main(int argc, char *argv[]){
   printf("AVX + MULTI-THREADED EXECUTION: %f (sec)\n", time_avx); // 8 640 - 0.445056
   printf("PARALLEL EXECUTION WITH %d (threads) ON %d (processors): %f (sec)\n",
 	 omp_get_max_threads(), omp_get_num_procs(), time_pl); // 8 640 - 0.618194
+  printf("SEQUENTIAL EXECUTION : %f (sec)\n", time_sq); // 8 640 - 0.618194
 
   //check
   int i;
@@ -171,13 +140,6 @@ int main(int argc, char *argv[]){
       printf("wrong at position %d\n", i);
       return 0;
       }
-  
-
-  for(rows=0; rows<1; rows++){
-    printf("\n");
-    for(cols=0; cols<1; cols++)
-      printf("%.1f ", result_avx[rows*size+cols]);
-  }
 
   printf("\nDone");
   free(vector);
