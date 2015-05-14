@@ -37,7 +37,8 @@ extern void contrast1D(unsigned char *grayImage, const int width, const int heig
 //extern void contrast1DCuda
 
 extern void triangularSmooth(unsigned char *grayImage, unsigned char *smoothImage, const int width, const int height, const float *filter);
-//extern void triangularSmoothCuda
+extern void triangularSmoothCuda(unsigned char *grayImage, unsigned char *smoothImage, const int width, const int height,
+	const float *filter);
 
 int main(int argc, char *argv[]) 
 {
@@ -81,8 +82,8 @@ int main(int argc, char *argv[])
 	histogram1DCuda(grayImage.data(), histogramImageCuda.data(), grayImage.width(), grayImage.height(), histogramCuda, HISTOGRAM_SIZE, BAR_WIDTH);
 
 	if ( displayImages ) {
-		histogramImage.display("Histogram");
-		histogramImageCuda.display("Histogram Cudas");
+		//histogramImage.display("Histogram");
+		//histogramImageCuda.display("Histogram Cudas");
 	}
 	if ( saveAllImages ) {
 		histogramImage.save("./histogram.bmp");
@@ -93,7 +94,7 @@ int main(int argc, char *argv[])
 	//contrast1DCuda
 
 	if ( displayImages ) {
-		grayImage.display("Contrast Enhanced Image");
+		//grayImage.display("Contrast Enhanced Image");
 	}
 	if ( saveAllImages ) {
 		grayImage.save("./contrast.bmp");
@@ -103,12 +104,14 @@ int main(int argc, char *argv[])
 
 	// Triangular smooth (convolution)
 	CImg< unsigned char > smoothImage = CImg< unsigned char >(grayImage.width(), grayImage.height(), 1, 1);
+	CImg< unsigned char > smoothImageCuda = CImg< unsigned char >(grayImage.width(), grayImage.height(), 1, 1);
 
 	triangularSmooth(grayImage.data(), smoothImage.data(), grayImage.width(), grayImage.height(), filter);
-	//triangularSmoothCuda
+	triangularSmoothCuda(grayImage.data(), smoothImageCuda.data(), grayImage.width(), grayImage.height(), filter);
 	
 	if ( displayImages ) {
 		smoothImage.display("Smooth Image");
+		smoothImageCuda.display("Smooth Image");
 	}
 	
 	if ( saveAllImages ) {

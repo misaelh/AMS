@@ -1,16 +1,48 @@
-﻿Build started 5/14/2015 5:11:11 PM.
-     1>Project "D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\Assignment2\Assignment2\Assignment2.vcxproj" on node 2 (clean target(s)).
-     1>_PrepareForClean:
-         Deleting file "Debug\Assignment2.lastbuildstate".
-       CudaClean:
-         cmd.exe /C "C:\Users\Tudor\AppData\Local\Temp\tmpc46eac287ba24ddf98dbd198c486fed8.cmd"
-         "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -ccbin "c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"  -G   --keep-dir Debug -maxrregcount=0  --machine 32 --compile   -g   -DWIN32 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o Debug\filters.cu.obj "D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\filters.cu" -clean
+﻿Build started 5/14/2015 7:10:07 PM.
+     1>Project "D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\Assignment2\Assignment2\Assignment2.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Debug\Assignment2.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       AddCudaCompileDeps:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\cl.exe /E /nologo /showIncludes /TP /D__CUDACC__ /DWIN32 /D_DEBUG /D_CONSOLE /D_MBCS /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin" /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" /I. /FIcuda_runtime.h /c "D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\filters.cu" 
+       AddCudaCompilePropsDeps:
+       Skipping target "AddCudaCompilePropsDeps" because all output files are up-to-date with respect to the input files.
+       CudaBuild:
+         Compiling CUDA source file ..\..\filters.cu...
+         cmd.exe /C "C:\Users\Tudor\AppData\Local\Temp\tmp01bd616352e947d88fa986954050aef1.cmd"
+         "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -gencode=arch=compute_20,code=\"sm_20,compute_20\" --use-local-env --cl-version 2010 -ccbin "c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"  -G   --keep-dir Debug -maxrregcount=0  --machine 32 --compile -cudart static  -g   -DWIN32 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o Debug\filters.cu.obj "D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\filters.cu"
          
-         D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\Assignment2\Assignment2>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -ccbin "c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"  -G   --keep-dir Debug -maxrregcount=0  --machine 32 --compile   -g   -DWIN32 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o Debug\filters.cu.obj "D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\filters.cu" -clean 
+         D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\Assignment2\Assignment2>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -gencode=arch=compute_20,code=\"sm_20,compute_20\" --use-local-env --cl-version 2010 -ccbin "c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"  -G   --keep-dir Debug -maxrregcount=0  --machine 32 --compile -cudart static  -g   -DWIN32 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o Debug\filters.cu.obj "D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\filters.cu" 
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lab2/Lab2shareable/filters.cu(163): warning : variable "hist" was declared but never referenced
+         
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lab2/Lab2shareable/filters.cu(163): warning : variable "hist" was declared but never referenced
+         
          filters.cu
-         Deleting file "Debug\..\..\filters.cu.deps".
-     1>Done Building Project "D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\Assignment2\Assignment2\Assignment2.vcxproj" (clean target(s)).
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lab2/Lab2shareable/filters.cu(199): warning C4018: '<' : signed/unsigned mismatch
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lab2/Lab2shareable/filters.cu(255): warning C4018: '<' : signed/unsigned mismatch
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lab2/Lab2shareable/filters.cu(311): warning C4244: 'initializing' : conversion from 'unsigned int' to 'float', possible loss of data
+       ClCompile:
+         All outputs are up-to-date.
+       Link:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\Assignment2\Debug\Assignment2.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\lib\Win32" cudart.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\Assignment2.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\Assignment2\Debug\Assignment2.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\Assignment2\Debug\Assignment2.lib" /MACHINE:X86 Debug\filters.cu.obj
+         Debug\main.obj
+         Debug\Timer.obj
+     1>main.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/INCREMENTAL:NO' specification
+         Assignment2.vcxproj -> D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\Assignment2\Debug\Assignment2.exe
+       Manifest:
+         c:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\Assignment2\Debug\Assignment2.exe;#1" /manifest Debug\Assignment2.exe.intermediate.manifest
+       PostBuildEvent:
+         echo copy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\cudart*.dll" "D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\Assignment2\Debug\"
+         copy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\cudart*.dll" "D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\Assignment2\Debug\"
+         :VCEnd
+         copy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\cudart*.dll" "D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\Assignment2\Debug\"
+         C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\cudart32_70.dll
+         C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\cudart64_70.dll
+                 2 file(s) copied.
+       FinalizeBuildStatus:
+         Deleting file "Debug\Assignment2.unsuccessfulbuild".
+         Touching "Debug\Assignment2.lastbuildstate".
+     1>Done Building Project "D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\Assignment2\Assignment2\Assignment2.vcxproj" (build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.48
+Time Elapsed 00:00:04.96
