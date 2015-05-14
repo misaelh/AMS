@@ -57,7 +57,7 @@ double NSTimer::get_CPU_speed_in_MHz() {
 
 	return 0.0;
 #else
-#warning unsupported architecture
+//#warning unsupported architecture
 	return 0.0;
 #endif
 }

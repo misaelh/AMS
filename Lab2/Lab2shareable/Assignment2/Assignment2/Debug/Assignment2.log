@@ -1,0 +1,16 @@
+﻿Build started 5/14/2015 5:11:11 PM.
+     1>Project "D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\Assignment2\Assignment2\Assignment2.vcxproj" on node 2 (clean target(s)).
+     1>_PrepareForClean:
+         Deleting file "Debug\Assignment2.lastbuildstate".
+       CudaClean:
+         cmd.exe /C "C:\Users\Tudor\AppData\Local\Temp\tmpc46eac287ba24ddf98dbd198c486fed8.cmd"
+         "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -ccbin "c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"  -G   --keep-dir Debug -maxrregcount=0  --machine 32 --compile   -g   -DWIN32 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o Debug\filters.cu.obj "D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\filters.cu" -clean
+         
+         D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\Assignment2\Assignment2>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -ccbin "c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"  -G   --keep-dir Debug -maxrregcount=0  --machine 32 --compile   -g   -DWIN32 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o Debug\filters.cu.obj "D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\filters.cu" -clean 
+         filters.cu
+         Deleting file "Debug\..\..\filters.cu.deps".
+     1>Done Building Project "D:\Workspace\Advanced Multicore Systems\AMS\Lab2\Lab2shareable\Assignment2\Assignment2\Assignment2.vcxproj" (clean target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.48
