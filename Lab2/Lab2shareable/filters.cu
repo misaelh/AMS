@@ -356,6 +356,7 @@ __global__ void triangularSmoothKernel(unsigned char *grayScale, unsigned char *
 
 	int x, y;
 	int el_sum = 0;
+	float smoothened_f = 0.0f;
 
 	int x_start = 0, x_end = 5, y_start = 0, y_end = 5;
 
@@ -376,11 +377,12 @@ __global__ void triangularSmoothKernel(unsigned char *grayScale, unsigned char *
 
 	for(y = y_start; y < y_end; y++){
 		for(x = x_start; x < x_end; x++) {
-			smoothened[pixelPos] += window[5*y+x] * grayScale[pixelPos+x-2+(y-2)*width];
+			smoothened_f += window[5*y+x] * grayScale[pixelPos+x-2+(y-2)*width];
 			el_sum +=window[5*y+x];
 		}
 	}
-	smoothened[pixelPos]/=el_sum;
+	smoothened_f/=el_sum;
+	smoothened[pixelPos] = smoothened_f;
 }
 
 void triangularSmoothCuda(unsigned char *grayImage, unsigned char *smoothImage, const int width, const int height,
