@@ -26,6 +26,14 @@ checkCudaCall(cudaGetLastError());
 	}                                                               \
 }
 
+__constant__ float filter_sum = 35.0f;
+
+__constant__ float filterCuda[] = {	1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 
+						1.0f, 2.0f, 2.0f, 2.0f, 1.0f, 
+						1.0f, 2.0f, 3.0f, 2.0f, 1.0f, 
+						1.0f, 2.0f, 2.0f, 2.0f, 1.0f, 
+						1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+};
 __global__ void rgb2grayCudaKernel(unsigned char *deviceImage, unsigned char *deviceResult, const int height, const int width){
 	/* calculate the global thread id*/
 	int threadsPerBlock  = blockDim.x * blockDim.y;
@@ -185,7 +193,7 @@ void histogram1DCuda(unsigned char *grayImage, unsigned char *histogramImage,con
 		}
 	}
 
-	for ( int x = 0; x < HISTOGRAM_SIZE * BAR_WIDTH; x += BAR_WIDTH ) 
+	for ( unsigned int x = 0; x < HISTOGRAM_SIZE * BAR_WIDTH; x += BAR_WIDTH ) 
 	{
 		unsigned int value = HISTOGRAM_SIZE - ((histogram[x / BAR_WIDTH] * HISTOGRAM_SIZE) / max);
 
@@ -241,7 +249,7 @@ void histogram1D(unsigned char *grayImage, unsigned char *histogramImage,const i
 		}
 	}
 
-	for ( int x = 0; x < HISTOGRAM_SIZE * BAR_WIDTH; x += BAR_WIDTH ) 
+	for ( unsigned int x = 0; x < HISTOGRAM_SIZE * BAR_WIDTH; x += BAR_WIDTH ) 
 	{
 		unsigned int value = HISTOGRAM_SIZE - ((histogram[x / BAR_WIDTH] * HISTOGRAM_SIZE) / max);
 
@@ -291,9 +299,7 @@ unsigned int grayPix = static_cast< unsigned int >(deviceImage[i]);
 	}
 
 	deviceResult[i] = static_cast< unsigned char > (grayPix);
-
 }
-
 
 void contrast1DCuda(unsigned char *grayImage, const int width, const int height, 
 	unsigned int *histogram, const unsigned int HISTOGRAM_SIZE, 
@@ -419,7 +425,7 @@ void contrast1D(unsigned char *grayImage, const int width, const int height,
 	//cout << "contrast1D (cpu): \t\t" << kernelTime.getElapsed() << " seconds." << endl;
 }
 
-__global__ void triangularSmoothKernel(unsigned char *grayScale, unsigned char *smoothened, unsigned int width, unsigned int height, float *window)
+__global__ void triangularSmoothKernel(unsigned char *grayScale, unsigned char *smoothened, unsigned int width, unsigned int height)
 {
 	int threadsPerBlock  = blockDim.x * blockDim.y;
 	int threadNumInBlock = threadIdx.x + blockDim.x * threadIdx.y;
@@ -431,51 +437,93 @@ __global__ void triangularSmoothKernel(unsigned char *grayScale, unsigned char *
 	int modHeight = (pixelPos/width);
 
 	int x, y;
-	int el_sum = 0;
-	float smoothened_f = 0.0f;
+	float smoothened_0 = 0, smoothened_1 = 0, smoothened_2 = 0, smoothened_3 = 0, smoothened_4 = 0, smoothened_f = 0;
+	bool unrollFlag = true;
+	int width2pos = 2*width, width2minus = -width2pos;
 
 	int x_start = 0, x_end = 5, y_start = 0, y_end = 5;
 
 	if(pixelPos >= width * height)
 		return;
 
-	if(modWidth <=1)
-		x_start = 2-modWidth;
-
-	if(modWidth > width - 3)
-		x_end = 2 + width - modWidth;
-
-	if(modHeight <=1)
-		y_start = 2-modHeight;
-
-	if(modHeight > height - 3)
-		y_end = 2 + height - modHeight;
-
-	for(y = y_start; y < y_end; y++){
-		for(x = x_start; x < x_end; x++) {
-			smoothened_f += window[5*y+x] * grayScale[pixelPos+x-2+(y-2)*width];
-			el_sum +=window[5*y+x];
-		}
+	if((modWidth < 2) || (modWidth > width - 3)) {
+		unrollFlag = false;
+		if(modWidth < 2)
+			x_start = 2 - modWidth;
+		else
+			x_end = 2 + width - modWidth;
 	}
-	smoothened_f/=el_sum;
-	smoothened[pixelPos] = smoothened_f;
+
+	if((modHeight < 2) || (modHeight > height - 3)) {
+		unrollFlag = false;
+		if(modHeight < 2)
+			y_start = 2 - modHeight;
+		else
+			y_end = 2 + height - modHeight;
+	}
+
+	if(!unrollFlag){
+		float el_sum = 0;
+		for(y = y_start; y < y_end; y++){
+			for(x = x_start; x < x_end; x++) {
+				smoothened_f += filterCuda[5*y+x] * grayScale[pixelPos+x-2+(y-2)*width];
+				el_sum += filterCuda[5*y+x];
+			}
+		}
+		smoothened_f/=el_sum;
+		smoothened[pixelPos] = smoothened_f;
+	}
+	else {
+		smoothened_0 += filterCuda[0] * grayScale[pixelPos-2+width2minus];
+		smoothened_1 += filterCuda[1] * grayScale[pixelPos-1+width2minus];
+		smoothened_2 += filterCuda[2] * grayScale[pixelPos+0+width2minus];
+		smoothened_3 += filterCuda[3] * grayScale[pixelPos+1+width2minus];
+		smoothened_4 += filterCuda[4] * grayScale[pixelPos+2+width2minus];
+
+		smoothened_0 += filterCuda[5] * grayScale[pixelPos-2-width];
+		smoothened_1 += filterCuda[6] * grayScale[pixelPos-1-width];
+		smoothened_2 += filterCuda[7] * grayScale[pixelPos+0-width];
+		smoothened_3 += filterCuda[8] * grayScale[pixelPos+1-width];
+		smoothened_4 += filterCuda[9] * grayScale[pixelPos+2-width];
+
+		smoothened_0 += filterCuda[10] * grayScale[pixelPos-2];
+		smoothened_1 += filterCuda[11] * grayScale[pixelPos-1];
+		smoothened_2 += filterCuda[12] * grayScale[pixelPos+0];
+		smoothened_3 += filterCuda[13] * grayScale[pixelPos+1];
+		smoothened_4 += filterCuda[14] * grayScale[pixelPos+2];
+
+		smoothened_0 += filterCuda[15] * grayScale[pixelPos-2+width];
+		smoothened_1 += filterCuda[16] * grayScale[pixelPos-1+width];
+		smoothened_2 += filterCuda[17] * grayScale[pixelPos+0+width];
+		smoothened_3 += filterCuda[18] * grayScale[pixelPos+1+width];
+		smoothened_4 += filterCuda[19] * grayScale[pixelPos+2+width];
+
+		smoothened_0 += filterCuda[20] * grayScale[pixelPos-2+width2pos];
+		smoothened_1 += filterCuda[21] * grayScale[pixelPos-1+width2pos];
+		smoothened_2 += filterCuda[22] * grayScale[pixelPos+0+width2pos];
+		smoothened_3 += filterCuda[23] * grayScale[pixelPos+1+width2pos];
+		smoothened_4 += filterCuda[24] * grayScale[pixelPos+2+width2pos];
+		
+		smoothened_0 = smoothened_0 + smoothened_1;
+		smoothened_3 = smoothened_3 + smoothened_4;
+		smoothened_0 += smoothened_2 + smoothened_3;
+
+		smoothened_0/=filter_sum;
+		smoothened[pixelPos] = smoothened_0;
+	}
 }
 
-void triangularSmoothCuda(unsigned char *grayImage, unsigned char *smoothImage, const int width, const int height,
-	const float *filter)
+void triangularSmoothCuda(unsigned char *grayImage, unsigned char *smoothImage, const int width, const int height)
 {
 	unsigned char *cudaImGray, *cudaEnhanced;
-	float *cudaFilter;
 	unsigned int xGridDim = 0, yGridDim = 1;
 	unsigned int imageSize = width * height;
 
 	cudaMalloc((void**)&cudaImGray, height*width*sizeof(unsigned char));
 	cudaMalloc((void**)&cudaEnhanced, height*width*sizeof(unsigned char));
-	cudaMalloc((void**)&cudaFilter, 25*sizeof(float));
 
 	cudaMemcpy(cudaImGray, grayImage, height*width*sizeof(unsigned char), cudaMemcpyHostToDevice);
 	cudaMemset(cudaEnhanced, 0, height*width*sizeof(unsigned char));
-	cudaMemcpy(cudaFilter, filter, 25*sizeof(float), cudaMemcpyHostToDevice);
 
 	if(imageSize >= 8192*8192)
 		if(imageSize%(8192*8192-1)==0)
@@ -492,12 +540,11 @@ void triangularSmoothCuda(unsigned char *grayImage, unsigned char *smoothImage, 
 	dim3 grid(xGridDim,yGridDim,1);
 	dim3 block(32,32,1);
 
-	triangularSmoothKernel<<<grid, block>>> (cudaImGray, cudaEnhanced, width, height, cudaFilter);
+	triangularSmoothKernel<<<grid, block>>> (cudaImGray, cudaEnhanced, width, height);
 	cudaError err = cudaMemcpy(smoothImage, cudaEnhanced ,height*width*sizeof(unsigned char), cudaMemcpyDeviceToHost);
 	
 	cudaFree(cudaImGray);
 	cudaFree(cudaEnhanced);
-	cudaFree(cudaFilter);
 }
 
 void triangularSmooth(unsigned char *grayImage, unsigned char *smoothImage, const int width, const int height,

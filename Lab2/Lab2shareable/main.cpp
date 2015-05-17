@@ -38,8 +38,7 @@ extern void contrast1D(unsigned char *grayImage, const int width, const int heig
 extern void contrast1DCuda(unsigned char *grayImage, const int width, const int height, unsigned int *histogram, const unsigned int HISTOGRAM_SIZE, const unsigned int CONTRAST_THRESHOLD);
 
 extern void triangularSmooth(unsigned char *grayImage, unsigned char *smoothImage, const int width, const int height, const float *filter);
-extern void triangularSmoothCuda(unsigned char *grayImage, unsigned char *smoothImage, const int width, const int height,
-	const float *filter);
+extern void triangularSmoothCuda(unsigned char *grayImage, unsigned char *smoothImage, const int width, const int height);
 
 int main(int argc, char *argv[]) 
 {
@@ -151,7 +150,7 @@ int main(int argc, char *argv[])
 
 	QueryPerformanceCounter(&count);
 	start = count.QuadPart;
-	triangularSmoothCuda(grayImageCuda.data(), smoothImageCuda.data(), grayImageCuda.width(), grayImageCuda.height(), filter);
+	triangularSmoothCuda(grayImageCuda.data(), smoothImageCuda.data(), grayImageCuda.width(), grayImageCuda.height());
 	QueryPerformanceCounter(&count);
 	start = double(count.QuadPart - start)/PCFreq;
 	printf("Smooth compute CUDA: %d miliseconds\n",start);
