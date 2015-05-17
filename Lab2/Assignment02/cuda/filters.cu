@@ -341,19 +341,6 @@ void contrast1D(unsigned char *grayImage, const int width, const int height,
 	cout << "contrast1D (cpu): \t\t" << kernelTime.getElapsed() << " seconds." << endl;
 }
 
-/////////////////////////////////////
-/*
-__global__ void triangularSmoothKernel
-{
-}
-*/
-
-/*
-void triangularSmoothCuda
-{
-}
-*/
-
 void triangularSmooth(unsigned char *grayImage, unsigned char *smoothImage, const int width, const int height,
 	const float *filter) 
 {
