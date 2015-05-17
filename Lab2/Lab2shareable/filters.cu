@@ -45,24 +45,29 @@ void rgb2grayCuda(unsigned char *inputImage, unsigned char *grayImage, const int
 	unsigned char *deviceImage;
 	unsigned char *deviceResult;
 
-	int initialBytes = width * height * 3 * sizeof(unsigned char);  
+	int initialBytes = width * height * 3 *sizeof(unsigned char);
 	int endBytes =  width * height * sizeof(unsigned char);
+	unsigned int xGridDim = 0;
 
-	cudaMalloc((void**) &deviceImage, initialBytes);
-	cudaMalloc((void**) &deviceResult, endBytes);
-	cudaMemset(deviceResult, 0, endBytes);
-	cudaMemset(deviceImage, 0, initialBytes);
+	cudaError_t err = cudaMalloc((void**) &deviceImage, initialBytes);
+	err = cudaMalloc((void**) &deviceResult, endBytes);
+	err = cudaMemset(deviceResult, 0, endBytes);
+	err = cudaMemset(deviceImage, 0, initialBytes);
 
-	cudaError_t err = cudaMemcpy(deviceImage, inputImage, initialBytes, cudaMemcpyHostToDevice);    
+	err = cudaMemcpy(deviceImage, inputImage, initialBytes, cudaMemcpyHostToDevice);
+	if(width%1024==0)
+		xGridDim = width / 1024;
+	else
+		xGridDim = width / 1024 + 1;
 
 	// Convert the input image to grayscale 
-	dim3 grid(width * height / 256+1,1,1);
-	dim3 block(16,16,1);
+	dim3 grid(xGridDim,height,1);
+	dim3 block(32,32,1);
 
 	rgb2grayCudaKernel<<<grid, block>>>(deviceImage, deviceResult, height, width);
-	cudaDeviceSynchronize();
+	 err = cudaDeviceSynchronize();
 
-	cudaMemcpy(grayImage, deviceResult, endBytes, cudaMemcpyDeviceToHost);
+	err = cudaMemcpy(grayImage, deviceResult, endBytes, cudaMemcpyDeviceToHost);
 	cudaFree(deviceImage);
 	cudaFree(deviceResult);
 }
@@ -138,14 +143,19 @@ void histogram1DCuda(unsigned char *grayImage, unsigned char *histogramImage,con
 	unsigned char *grayImgCuda;
 	unsigned int *histArrayComputedCuda;
 	unsigned int *histCuda;
+	unsigned int xGridDim = 0;
 
 	cudaMalloc((void **) &histArrayComputedCuda, height*HISTOGRAM_SIZE*sizeof(unsigned int));
 	cudaMemset(histArrayComputedCuda, 0, height*HISTOGRAM_SIZE*sizeof(unsigned int));
 	cudaMalloc((void **) &grayImgCuda, width*height*sizeof(unsigned char));
 
-	//dim3 gridSize(height/256+1,1,1);
-	dim3 gridSize(16,1,1);
-	dim3 blockSize(16,16,1);
+	if(height%1024==0)
+		xGridDim = height / 1024;
+	else
+		xGridDim = height / 1024 + 1;
+
+	dim3 gridSize(xGridDim,1,1);
+	dim3 blockSize(32,32,1);
 	cudaMemcpy(grayImgCuda,grayImage,sizeof(unsigned char)*height*width,cudaMemcpyHostToDevice);
 	histogram1DCudaKernel<<<gridSize, blockSize>>>(grayImgCuda, histArrayComputedCuda, HISTOGRAM_SIZE, width, height);
 	cudaError err = cudaDeviceSynchronize();
@@ -153,8 +163,8 @@ void histogram1DCuda(unsigned char *grayImage, unsigned char *histogramImage,con
 	err = cudaMalloc((void **)&histCuda,HISTOGRAM_SIZE*sizeof(unsigned int));
 	err = cudaMemset(histCuda, 0, HISTOGRAM_SIZE*sizeof(unsigned int));
 
-	dim3 gridSize2(16,1,1);
-	dim3 blockSize2(16,1,1);
+	dim3 gridSize2(1,1,1);
+	dim3 blockSize2(16,16,1);
 	//err = cudaMemcpy(histArrayComputedCuda, histArray, height*HISTOGRAM_SIZE*sizeof(unsigned int), cudaMemcpyHostToDevice);
 	sumHistCuda<<<gridSize, blockSize2>>>(histArrayComputedCuda, histCuda, 256, height, width);
 	err = cudaDeviceSynchronize();
@@ -258,7 +268,7 @@ __global__ void contrast1DCudaKernel(unsigned char *deviceImage, unsigned char *
     int globalThreadNum = blockNumInGrid * threadsPerBlock + threadNumInBlock;
     int i = globalThreadNum;
 
-    unsigned int grayPix = static_cast< unsigned int >(deviceImage[i]);
+unsigned int grayPix = static_cast< unsigned int >(deviceImage[i]);
 
 	if ( grayPix < min ) 
 	{
@@ -286,7 +296,7 @@ void contrast1DCuda(unsigned char *grayImage, const int width, const int height,
     unsigned char *deviceResult;
 
     int numBytes =  width * height * sizeof(unsigned char);
-	unsigned int i = 0;
+	unsigned int i = 0, xGridDim = 0;
 	unsigned int maxHist = 0;
 
 	for ( unsigned int i = 0; i < HISTOGRAM_SIZE; i++ ) 
@@ -318,11 +328,15 @@ void contrast1DCuda(unsigned char *grayImage, const int width, const int height,
     cudaMemset(deviceImage, 0, numBytes);
 
     cudaError_t err = cudaMemcpy(deviceImage, grayImage, numBytes, cudaMemcpyHostToDevice);    
+	if(height%1024==0)
+		xGridDim = height / 1024;
+	else
+		xGridDim = height / 1024 + 1;
 
-	dim3 grid(width * height / 256+1,1,1);
-	dim3 block(16,16,1);
-
-	contrast1DCudaKernel<<<grid,block>>>(deviceImage, deviceResult, height, width, min, max, diff);
+	dim3 gridSize(xGridDim,width,1);
+	dim3 blockSize(32,32,1);
+    // Convert the input image to grayscale 
+    contrast1DCudaKernel<<<gridSize, blockSize>>>(deviceImage, deviceResult, height, width, min, max, diff);
     cudaDeviceSynchronize();
 
     cudaMemcpy(grayImage, deviceResult, numBytes, cudaMemcpyDeviceToHost);
@@ -437,6 +451,7 @@ void triangularSmoothCuda(unsigned char *grayImage, unsigned char *smoothImage, 
 {
 	unsigned char *cudaImGray, *cudaEnhanced;
 	float *cudaFilter;
+	unsigned int xGridDim = 0;
 
 	cudaMalloc((void**)&cudaImGray, height*width*sizeof(unsigned char));
 	cudaMalloc((void**)&cudaEnhanced, height*width*sizeof(unsigned char));
@@ -446,10 +461,15 @@ void triangularSmoothCuda(unsigned char *grayImage, unsigned char *smoothImage, 
 	cudaMemset(cudaEnhanced, 0, height*width*sizeof(unsigned char));
 	cudaMemcpy(cudaFilter, filter, 25*sizeof(float), cudaMemcpyHostToDevice);
 
-	dim3 gridSize2(8192, 1, 1);
-	dim3 blockSize2(16, 31, 1);
+	if(height%1024==0)
+		xGridDim = height / 1024;
+	else
+		xGridDim = height / 1024 + 1;
 
-	triangularSmoothKernel<<<gridSize2, blockSize2>>> (cudaImGray, cudaEnhanced, width, height, cudaFilter);
+	dim3 gridSize(xGridDim,width,1);
+	dim3 blockSize(32,32,1);
+
+	triangularSmoothKernel<<<gridSize, blockSize>>> (cudaImGray, cudaEnhanced, width, height, cudaFilter);
 	cudaError err = cudaMemcpy(smoothImage, cudaEnhanced ,height*width*sizeof(unsigned char), cudaMemcpyDeviceToHost);
 	
 	cudaFree(cudaImGray);
@@ -498,5 +518,3 @@ void triangularSmooth(unsigned char *grayImage, unsigned char *smoothImage, cons
 	//cout << fixed << setprecision(6);
 	//cout << "triangularSmooth (cpu): \t" << kernelTime.getElapsed() << " seconds." << endl;
 }
-
-

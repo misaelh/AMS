@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
 	cout << "Count errors: " << cnt << endl;
 
 	if ( displayImages ) {
-		//grayImageDiff.display("Smooth Image Diff");
+		grayImageDiff.display("Smooth Image Diff");
 		//smoothImage.display("Smooth Image");
 		//smoothImageCuda.display("Smooth Image Cuda");
 	}

@@ -1,5 +1,7 @@
 Lab2/Assignment02/*
-Lab2/examples/
-Lab2/workspace/
+Lab2/examples/*
+Lab2/workspace/*
+
+Lab2shareable/Assignment2/
 
 Lab2/Assignment02/cuda/filters.cu
