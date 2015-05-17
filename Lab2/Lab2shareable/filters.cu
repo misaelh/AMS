@@ -258,7 +258,7 @@ __global__ void contrast1DCudaKernel(unsigned char *deviceImage, unsigned char *
     int globalThreadNum = blockNumInGrid * threadsPerBlock + threadNumInBlock;
     int i = globalThreadNum;
 
-    float grayPix = static_cast< float >(deviceImage[i]);
+    unsigned int grayPix = static_cast< unsigned int >(deviceImage[i]);
 
 	if ( grayPix < min ) 
 	{
@@ -270,7 +270,7 @@ __global__ void contrast1DCudaKernel(unsigned char *deviceImage, unsigned char *
 	}
 	else 
 	{
-		grayPix = static_cast< unsigned char >(255.0f * (grayPix - min) / diff);
+		grayPix = (255 * (grayPix - min) / diff);
 	}
 
 	deviceResult[i] = static_cast< unsigned char > (grayPix);
@@ -319,8 +319,10 @@ void contrast1DCuda(unsigned char *grayImage, const int width, const int height,
 
     cudaError_t err = cudaMemcpy(deviceImage, grayImage, numBytes, cudaMemcpyHostToDevice);    
 
-    // Convert the input image to grayscale 
-    contrast1DCudaKernel<<<width * height / 256, 256>>>(deviceImage, deviceResult, height, width, min, max, diff);
+	dim3 grid(width * height / 256+1,1,1);
+	dim3 block(16,16,1);
+
+	contrast1DCudaKernel<<<grid,block>>>(deviceImage, deviceResult, height, width, min, max, diff);
     cudaDeviceSynchronize();
 
     cudaMemcpy(grayImage, deviceResult, numBytes, cudaMemcpyDeviceToHost);

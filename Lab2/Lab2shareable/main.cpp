@@ -80,8 +80,8 @@ int main(int argc, char *argv[])
 	QueryPerformanceCounter(&count);
 	start = double(count.QuadPart - start)/PCFreq;
 	if ( displayImages ) {
-		grayImageCuda.display("Grayscale Image Cuda");
-		grayImage.display("Grayscale Image");
+		//grayImageCuda.display("Grayscale Image Cuda");
+		//grayImage.display("Grayscale Image");
 	}
 	if ( saveAllImages ) {
 		grayImage.save("./grayscale.bmp");
@@ -156,17 +156,20 @@ int main(int argc, char *argv[])
 	start = double(count.QuadPart - start)/PCFreq;
 	printf("Smooth compute CUDA: %d miliseconds\n",start);
 	
+	unsigned int cnt=0;
 	CImg< unsigned char > grayImageDiff = CImg< unsigned char >(inputImage.width(), inputImage.height(), 1, 1);
 	for ( int y = 0; y < grayImage.height()*grayImage.width(); y++ ) 
 	{
-		grayImageDiff[y] = smoothImage.data()[y] - smoothImageCuda.data()[y];
+		grayImageDiff[y] = smoothImage[y] - smoothImageCuda[y];
 			if(grayImageDiff[y]!=0){
-				 grayImageDiff[y] = 255;
+				cnt++;
+				grayImageDiff[y] = 255;
 			}
 	}
+	cout << "Count errors: " << cnt << endl;
 
 	if ( displayImages ) {
-		grayImageDiff.display("Smooth Image Diff");
+		//grayImageDiff.display("Smooth Image Diff");
 		//smoothImage.display("Smooth Image");
 		//smoothImageCuda.display("Smooth Image Cuda");
 	}
@@ -176,6 +179,6 @@ int main(int argc, char *argv[])
 	//	smoothImageCuda.save("./smoothCuda.bmp");
 	//}
 
-	return 0;
+ 	return 0;
 }
 
