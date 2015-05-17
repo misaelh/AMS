@@ -277,26 +277,103 @@ void histogram1D(unsigned char *grayImage, unsigned char *histogramImage,const i
 }
 
 /////////////////////////////////////
-/*
-__global__ void contrast1DKernel
-{
-}
-*/
 
-/*
-void contrast1DCuda
+__global__ void contrast1DCudaKernel(unsigned char *deviceImage, unsigned char *deviceResult, const int height, const int width,
+								 unsigned int min, unsigned int max, float diff)
 {
+	int threadsPerBlock  = blockDim.x * blockDim.y;
+    int threadNumInBlock = threadIdx.x + blockDim.x * threadIdx.y;
+    int blockNumInGrid   = blockIdx.x  + gridDim.x  * blockIdx.y;
+
+    int globalThreadNum = blockNumInGrid * threadsPerBlock + threadNumInBlock;
+    int i = globalThreadNum;
+
+    float grayPix = static_cast< float >(deviceImage[i]);
+
+	if ( grayPix < min ) 
+	{
+		grayPix = 0;
+	}
+	else if ( grayPix > max ) 
+	{
+		grayPix = 255;
+	}
+	else 
+	{
+		grayPix = static_cast< unsigned char >(255.0f * (grayPix - min) / diff);
+	}
+
+	deviceResult[i] = static_cast< unsigned char > (grayPix);
+
 }
-*/
+
+
+void contrast1DCuda(unsigned char *grayImage, const int width, const int height, 
+	unsigned int *histogram, const unsigned int HISTOGRAM_SIZE, 
+	const unsigned int CONTRAST_THRESHOLD) 
+{
+    unsigned char *deviceImage;
+    unsigned char *deviceResult;
+
+    int numBytes =  width * height * sizeof(unsigned char);
+	unsigned int i = 0;
+	unsigned int maxHist = 0;
+
+	for ( unsigned int i = 0; i < HISTOGRAM_SIZE; i++ ) 
+	{
+		if ( histogram[i] > maxHist ) 
+		{
+			maxHist = histogram[i];
+		}
+	}
+
+	i=0;
+	while ( (i < HISTOGRAM_SIZE) && ((histogram[i]*HISTOGRAM_SIZE)/maxHist < CONTRAST_THRESHOLD) ) 
+	{
+		i++;
+	}
+	unsigned int min = i;
+
+	i = HISTOGRAM_SIZE - 1;
+	while ( (i > min) && (histogram[i] < CONTRAST_THRESHOLD) ) 
+	{
+		i--;
+	}
+	unsigned int max = i;
+	float diff = max - min;
+
+	cudaMalloc((void**) &deviceImage, numBytes);
+    cudaMalloc((void**) &deviceResult, numBytes);
+    cudaMemset(deviceResult, 0, numBytes);
+    cudaMemset(deviceImage, 0, numBytes);
+
+    cudaError_t err = cudaMemcpy(deviceImage, grayImage, numBytes, cudaMemcpyHostToDevice);    
+
+    // Convert the input image to grayscale 
+    contrast1DCudaKernel<<<width * height / 256, 256>>>(deviceImage, deviceResult, height, width, min, max, diff);
+    cudaDeviceSynchronize();
+
+    cudaMemcpy(grayImage, deviceResult, numBytes, cudaMemcpyDeviceToHost);
+
+}
 
 void contrast1D(unsigned char *grayImage, const int width, const int height, 
 	unsigned int *histogram, const unsigned int HISTOGRAM_SIZE, 
 	const unsigned int CONTRAST_THRESHOLD) 
 {
 	unsigned int i = 0;
+	unsigned int maxHist = 0;
 	NSTimer kernelTime = NSTimer("kernelTime", false, false);
 
-	while ( (i < HISTOGRAM_SIZE) && (histogram[i] < CONTRAST_THRESHOLD) ) 
+	for ( unsigned int j = 0; j < HISTOGRAM_SIZE; j++ ) 
+	{
+		if ( histogram[j] > maxHist ) 
+		{
+			maxHist = histogram[j];
+		}
+	}
+
+	while ( (i < HISTOGRAM_SIZE) && ((histogram[i]*HISTOGRAM_SIZE/maxHist) < CONTRAST_THRESHOLD) ) 
 	{
 		i++;
 	}

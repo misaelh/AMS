@@ -34,7 +34,8 @@ extern void histogram1DCuda(unsigned char *grayImage, unsigned char *histogramIm
 	const unsigned int BAR_WIDTH);
 
 extern void contrast1D(unsigned char *grayImage, const int width, const int height, unsigned int *histogram, const unsigned int HISTOGRAM_SIZE, const unsigned int CONTRAST_THRESHOLD);
-//extern void contrast1DCuda
+extern void contrast1DCuda(unsigned char *grayImage, const int width, const int height, unsigned int *histogram, const unsigned int HISTOGRAM_SIZE, const unsigned int CONTRAST_THRESHOLD);
+
 
 extern void triangularSmooth(unsigned char *grayImage, unsigned char *smoothImage, const int width, const int height, const float *filter);
 extern void triangularSmoothCuda(unsigned char *grayImage, unsigned char *smoothImage, const int width, const int height,
@@ -79,7 +80,7 @@ int main(int argc, char *argv[])
 	unsigned int *histogramCuda = new unsigned int[HISTOGRAM_SIZE];
 
 	histogram1D(grayImage.data(), histogramImage.data(), grayImage.width(), grayImage.height(), histogram, HISTOGRAM_SIZE, BAR_WIDTH);
-	histogram1DCuda(grayImage.data(), histogramImageCuda.data(), grayImage.width(), grayImage.height(), histogramCuda, HISTOGRAM_SIZE, BAR_WIDTH);
+	histogram1DCuda(grayImageCuda.data(), histogramImageCuda.data(), grayImage.width(), grayImage.height(), histogramCuda, HISTOGRAM_SIZE, BAR_WIDTH);
 
 	if ( displayImages ) {
 		//histogramImage.display("Histogram");
@@ -91,7 +92,7 @@ int main(int argc, char *argv[])
 
 	// Contrast enhancement
 	contrast1D(grayImage.data(), grayImage.width(), grayImage.height(), histogram, HISTOGRAM_SIZE, CONTRAST_THRESHOLD);
-	//contrast1DCuda
+	contrast1DCuda(grayImageCuda.data(), grayImageCuda.width(), grayImageCuda.height(), histogramCuda, HISTOGRAM_SIZE, CONTRAST_THRESHOLD);
 
 	if ( displayImages ) {
 		//grayImage.display("Contrast Enhanced Image");
@@ -107,15 +108,26 @@ int main(int argc, char *argv[])
 	CImg< unsigned char > smoothImageCuda = CImg< unsigned char >(grayImage.width(), grayImage.height(), 1, 1);
 
 	triangularSmooth(grayImage.data(), smoothImage.data(), grayImage.width(), grayImage.height(), filter);
-	triangularSmoothCuda(grayImage.data(), smoothImageCuda.data(), grayImage.width(), grayImage.height(), filter);
-	
+	triangularSmoothCuda(grayImageCuda.data(), smoothImageCuda.data(), grayImageCuda.width(), grayImageCuda.height(), filter);
+	/*
+	CImg< unsigned char > grayImageDiff = CImg< unsigned char >(inputImage.width(), inputImage.height(), 1, 1);
+	for ( int y = 0; y < grayImage.height()*grayImage.width(); y++ ) 
+	{
+		grayImageDiff[y] = smoothImage.data()[y] - smoothImageCuda.data()[y];
+			if(grayImageDiff[y]!=0){
+				 grayImageDiff[y] = 255;
+			}
+	}*/
+
 	if ( displayImages ) {
+		//grayImageDiff.display("Smooth Image Diff");
 		smoothImage.display("Smooth Image");
-		smoothImageCuda.display("Smooth Image");
+		smoothImageCuda.display("Smooth Image Cuda");
 	}
 	
 	if ( saveAllImages ) {
 		smoothImage.save("./smooth.bmp");
+		smoothImageCuda.save("./smoothCuda.bmp");
 	}
 
 	return 0;
