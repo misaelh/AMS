@@ -5,3 +5,6 @@ Lab2/workspace/*
 Lab2shareable/Assignment2/
 
 Lab2/Assignment02/cuda/filters.cu
+*.opensdf
+Lab2/Lab2shareable/Assignment2/ipch/assignment2-de656b94/assignment2-c1fd4eb7.ipch
+*.ipch
