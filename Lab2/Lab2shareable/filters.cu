@@ -35,13 +35,9 @@ __global__ void rgb2grayCudaKernel(unsigned char *deviceImage, unsigned char *de
 	int globalThreadNum = blockNumInGrid * threadsPerBlock + threadNumInBlock;
 	int i = globalThreadNum;
 
-	float grayPix = 0.0f;
-	float r = static_cast< float >(deviceImage[i]);
-	float g = static_cast< float >(deviceImage[(width * height) + i]);
-	float b = static_cast< float >(deviceImage[(2 * width * height) + i]);
-	grayPix = (0.3f * r) + (0.59f * g) + (0.11f * b);
-
-	deviceResult[i] = static_cast< unsigned char > (grayPix);
+	int grayPix = 0;
+	grayPix = (30*deviceImage[i] + 59 * deviceImage[(width * height) + i] + 11 * deviceImage[(2 * width * height) + i])/100;
+	deviceResult[i] = grayPix;
 }
 
 void rgb2grayCuda(unsigned char *inputImage, unsigned char *grayImage, const int width, const int height) {
@@ -49,7 +45,7 @@ void rgb2grayCuda(unsigned char *inputImage, unsigned char *grayImage, const int
 	unsigned char *deviceImage;
 	unsigned char *deviceResult;
 
-	int initialBytes = width * height * 3;  
+	int initialBytes = width * height * 3 * sizeof(unsigned char);  
 	int endBytes =  width * height * sizeof(unsigned char);
 
 	cudaMalloc((void**) &deviceImage, initialBytes);
@@ -60,32 +56,13 @@ void rgb2grayCuda(unsigned char *inputImage, unsigned char *grayImage, const int
 	cudaError_t err = cudaMemcpy(deviceImage, inputImage, initialBytes, cudaMemcpyHostToDevice);    
 
 	// Convert the input image to grayscale 
-	rgb2grayCudaKernel<<<width * height / 256, 256>>>(deviceImage, deviceResult, height, width);
+	dim3 grid(width * height / 256+1,1,1);
+	dim3 block(16,16,1);
+
+	rgb2grayCudaKernel<<<grid, block>>>(deviceImage, deviceResult, height, width);
 	cudaDeviceSynchronize();
 
 	cudaMemcpy(grayImage, deviceResult, endBytes, cudaMemcpyDeviceToHost);
-
-	////// Sequential
-	for ( int y = 0; y < height; y++ ) {
-		for ( int x = 0; x < width; x++ ) {
-			float grayPix = 0.0f;
-			float r = static_cast< float >(inputImage[(y * width) + x]);
-			float g = static_cast< float >(inputImage[(width * height) + (y * width) + x]);
-			float b = static_cast< float >(inputImage[(2 * width * height) + (y * width) + x]);
-
-			grayPix = (0.3f * r) + (0.59f * g) + (0.11f * b);
-			grayImage[(y * width) + x] = static_cast< unsigned char > (grayPix);
-		}
-	}
-
-	//compare sequential and cuda and print pixels that are wrong
-	for (int i = 0; i < endBytes; i++)
-	{
-		if (grayImage[i] != grayImage[i])
-			cout << i << "-" << static_cast< unsigned int >(grayImage[i]) <<
-			" should be " << static_cast< unsigned int >(grayImage[i]) << endl;
-	}
-
 	cudaFree(deviceImage);
 	cudaFree(deviceResult);
 }
@@ -113,16 +90,10 @@ void rgb2gray(unsigned char *inputImage, unsigned char *grayImage, const int wid
 	// /Kernel
 	kernelTime.stop();
 
-	cout << fixed << setprecision(6);
-	cout << "rgb2gray (cpu): \t\t" << kernelTime.getElapsed() << " seconds." << endl;
+	//cout << fixed << setprecision(6);
+	//cout << "rgb2gray (cpu): \t\t" << kernelTime.getElapsed() << " seconds." << endl;
 }
 
-/////////////////////////////////////
-/*
-__global__ void histogram1DCudaKernel
-{
-}
-*/ 
 __global__ void histogram1DCudaKernel(unsigned char *grayImg, unsigned int *hist, const int no_of_bins, const int width, const int height){
 	/* calculate the global thread id*/
 	int threadsPerBlock  = blockDim.x * blockDim.y;
@@ -172,6 +143,7 @@ void histogram1DCuda(unsigned char *grayImage, unsigned char *histogramImage,con
 	cudaMemset(histArrayComputedCuda, 0, height*HISTOGRAM_SIZE*sizeof(unsigned int));
 	cudaMalloc((void **) &grayImgCuda, width*height*sizeof(unsigned char));
 
+	//dim3 gridSize(height/256+1,1,1);
 	dim3 gridSize(16,1,1);
 	dim3 blockSize(16,16,1);
 	cudaMemcpy(grayImgCuda,grayImage,sizeof(unsigned char)*height*width,cudaMemcpyHostToDevice);
@@ -216,8 +188,8 @@ void histogram1DCuda(unsigned char *grayImage, unsigned char *histogramImage,con
 		}
 	}
 
-	cout << fixed << setprecision(6);
-	cout << "histogram1D (cpu): \t\t" << kernelTime.getElapsed() << " seconds." << endl;
+	//cout << fixed << setprecision(6);
+	//cout << "histogram1D (cpu): \t\t" << kernelTime.getElapsed() << " seconds." << endl;
 	cudaFree(grayImgCuda);
 	cudaFree(histArrayComputedCuda);
 	cudaFree(histCuda);
@@ -272,11 +244,9 @@ void histogram1D(unsigned char *grayImage, unsigned char *histogramImage,const i
 		}
 	}
 
-	cout << fixed << setprecision(6);
-	cout << "histogram1D (cpu): \t\t" << kernelTime.getElapsed() << " seconds." << endl;
+	//cout << fixed << setprecision(6);
+	//cout << "histogram1D (cpu): \t\t" << kernelTime.getElapsed() << " seconds." << endl;
 }
-
-/////////////////////////////////////
 
 __global__ void contrast1DCudaKernel(unsigned char *deviceImage, unsigned char *deviceResult, const int height, const int width,
 								 unsigned int min, unsigned int max, float diff)
@@ -414,11 +384,9 @@ void contrast1D(unsigned char *grayImage, const int width, const int height,
 	// /Kernel
 	kernelTime.stop();
 
-	cout << fixed << setprecision(6);
-	cout << "contrast1D (cpu): \t\t" << kernelTime.getElapsed() << " seconds." << endl;
+	//cout << fixed << setprecision(6);
+	//cout << "contrast1D (cpu): \t\t" << kernelTime.getElapsed() << " seconds." << endl;
 }
-
-/////////////////////////////////////
 
 __global__ void triangularSmoothKernel(unsigned char *grayScale, unsigned char *smoothened, unsigned int width, unsigned int height, float *window)
 {
@@ -429,7 +397,7 @@ __global__ void triangularSmoothKernel(unsigned char *grayScale, unsigned char *
 	int globalThreadNum = blockNumInGrid * threadsPerBlock + threadNumInBlock;
 	int pixelPos = globalThreadNum;
 	int modWidth = pixelPos%width;
-	int modHeight = (pixelPos/width)%height;
+	int modHeight = (pixelPos/width);
 
 	int x, y;
 	int el_sum = 0;
@@ -443,14 +411,14 @@ __global__ void triangularSmoothKernel(unsigned char *grayScale, unsigned char *
 	if(modWidth <=1)
 		x_start = 2-modWidth;
 
-	if(modWidth >= width - 2)
-		x_end = 5 + modWidth - width;
+	if(modWidth > width - 3)
+		x_end = 2 + width - modWidth;
 
 	if(modHeight <=1)
 		y_start = 2-modHeight;
 
-	if(modHeight >= height - 2)
-		y_end = 5 + modHeight - height;
+	if(modHeight > height - 3)
+		y_end = 2 + height - modHeight;
 
 	for(y = y_start; y < y_end; y++){
 		for(x = x_start; x < x_end; x++) {
@@ -476,8 +444,8 @@ void triangularSmoothCuda(unsigned char *grayImage, unsigned char *smoothImage, 
 	cudaMemset(cudaEnhanced, 0, height*width*sizeof(unsigned char));
 	cudaMemcpy(cudaFilter, filter, 25*sizeof(float), cudaMemcpyHostToDevice);
 
-	dim3 gridSize2(65535, 1,1);
-	dim3 blockSize2(16,31,1);
+	dim3 gridSize2(8192, 1, 1);
+	dim3 blockSize2(16, 31, 1);
 
 	triangularSmoothKernel<<<gridSize2, blockSize2>>> (cudaImGray, cudaEnhanced, width, height, cudaFilter);
 	cudaError err = cudaMemcpy(smoothImage, cudaEnhanced ,height*width*sizeof(unsigned char), cudaMemcpyDeviceToHost);
@@ -525,8 +493,8 @@ void triangularSmooth(unsigned char *grayImage, unsigned char *smoothImage, cons
 	// /Kernel
 	kernelTime.stop();
 
-	cout << fixed << setprecision(6);
-	cout << "triangularSmooth (cpu): \t" << kernelTime.getElapsed() << " seconds." << endl;
+	//cout << fixed << setprecision(6);
+	//cout << "triangularSmooth (cpu): \t" << kernelTime.getElapsed() << " seconds." << endl;
 }
 
 
