@@ -1,0 +1,8 @@
+To compile the C implementation do
+$ gcc main.c -o sw
+
+To execute the C implementation do
+$ ./sw <string1> <string2>
+
+To execute ssearch do
+$ ./ssearch <string1> <string2>

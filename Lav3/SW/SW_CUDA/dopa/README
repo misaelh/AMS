@@ -1,0 +1,17 @@
+The dopa/ folder structure is as follows:
+
+dopa/ ->
+	dbconv 	-> converts the fasta db to the dopa gpu format.
+ 	gpu 	-> The src files for the dopa gpu implementation.
+
+Instructions:
+source the sourcemeCuda50 script as shown.
+	source /opt/cuda/sourcemeCuda50
+
+To generate the db in dopa gpu format, in the dbconv folder run the compile script as shown and execute the binary produced.
+	./compile.sh
+	./DBConv db.fasta
+
+To run the dopa gpu application, run the compile script in gpu folder as shown.
+	./compile.sh
+	./gasw -s blosum62.mat a.fasta ../dbconv/out.gpudb -o p2.lib
