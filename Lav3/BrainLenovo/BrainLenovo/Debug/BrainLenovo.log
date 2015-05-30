@@ -1,0 +1,78 @@
+﻿Build started 5/29/2015 2:40:15 PM.
+     1>Project "D:\Workspace\Advanced Multicore Systems\AMS\Lav3\BrainLenovo\BrainLenovo\BrainLenovo.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Debug\BrainLenovo.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       AddCudaCompileDeps:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\cl.exe /E /nologo /showIncludes /TP /D__CUDACC__ /DWIN32 /D_DEBUG /D_CONSOLE /D_MBCS /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin" /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" /I. /FIcuda_runtime.h /c "D:\Workspace\Advanced Multicore Systems\AMS\Lav3\BRAIN\BRAIN_CUDA\infoli_double_wcache_async.cu" 
+       AddCudaCompilePropsDeps:
+       Skipping target "AddCudaCompilePropsDeps" because all output files are up-to-date with respect to the input files.
+       CudaBuild:
+         Compiling CUDA source file ..\..\BRAIN\BRAIN_CUDA\infoli_double_wcache_async.cu...
+         cmd.exe /C "C:\Users\Tudor\AppData\Local\Temp\tmp4cf287e5ad704845bbdb01be17a335aa.cmd"
+         "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -gencode=arch=compute_20,code=\"sm_20,compute_20\" --use-local-env --cl-version 2010 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"  -G   --keep-dir Debug -maxrregcount=0  --machine 32 --compile -cudart static  -g   -DWIN32 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o Debug\infoli_double_wcache_async.cu.obj "D:\Workspace\Advanced Multicore Systems\AMS\Lav3\BRAIN\BRAIN_CUDA\infoli_double_wcache_async.cu"
+         
+         D:\Workspace\Advanced Multicore Systems\AMS\Lav3\BrainLenovo\BrainLenovo>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\nvcc.exe" -gencode=arch=compute_20,code=\"sm_20,compute_20\" --use-local-env --cl-version 2010 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include"  -G   --keep-dir Debug -maxrregcount=0  --machine 32 --compile -cudart static  -g   -DWIN32 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o Debug\infoli_double_wcache_async.cu.obj "D:\Workspace\Advanced Multicore Systems\AMS\Lav3\BRAIN\BRAIN_CUDA\infoli_double_wcache_async.cu" 
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning : variable "t0" was declared but never referenced
+         
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning : variable "t1" was declared but never referenced
+         
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning : variable "t2" was declared but never referenced
+         
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning : variable "t3" was declared but never referenced
+         
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning : variable "t4" was declared but never referenced
+         
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning : variable "t5" was declared but never referenced
+         
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning : variable "secs" was declared but never referenced
+         
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(107): warning : variable "time" was declared but never referenced
+         
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning : variable "t0" was declared but never referenced
+         
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning : variable "t1" was declared but never referenced
+         
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning : variable "t2" was declared but never referenced
+         
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning : variable "t3" was declared but never referenced
+         
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning : variable "t4" was declared but never referenced
+         
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning : variable "t5" was declared but never referenced
+         
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning : variable "secs" was declared but never referenced
+         
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(107): warning : variable "time" was declared but never referenced
+         
+         infoli_double_wcache_async.cu
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(179): warning C4244: '=' : conversion from 'double' to 'int', possible loss of data
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(283): warning C4068: unknown pragma
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(107): warning C4101: 'time' : unreferenced local variable
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning C4101: 't2' : unreferenced local variable
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning C4101: 'secs' : unreferenced local variable
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning C4101: 't3' : unreferenced local variable
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning C4101: 't5' : unreferenced local variable
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning C4101: 't1' : unreferenced local variable
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning C4101: 't4' : unreferenced local variable
+     1>D:/Workspace/Advanced Multicore Systems/AMS/Lav3/BRAIN/BRAIN_CUDA/infoli_double_wcache_async.cu(105): warning C4101: 't0' : unreferenced local variable
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Workspace\Advanced Multicore Systems\AMS\Lav3\BrainLenovo\Debug\BrainLenovo.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\lib\Win32" cudart.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\BrainLenovo.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"D:\Workspace\Advanced Multicore Systems\AMS\Lav3\BrainLenovo\Debug\BrainLenovo.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\Workspace\Advanced Multicore Systems\AMS\Lav3\BrainLenovo\Debug\BrainLenovo.lib" /MACHINE:X86 Debug\infoli_double_wcache_async.cu.obj
+         BrainLenovo.vcxproj -> D:\Workspace\Advanced Multicore Systems\AMS\Lav3\BrainLenovo\Debug\BrainLenovo.exe
+       Manifest:
+         c:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"D:\Workspace\Advanced Multicore Systems\AMS\Lav3\BrainLenovo\Debug\BrainLenovo.exe;#1" /manifest Debug\BrainLenovo.exe.intermediate.manifest
+       PostBuildEvent:
+         echo copy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\cudart*.dll" "D:\Workspace\Advanced Multicore Systems\AMS\Lav3\BrainLenovo\Debug\"
+         copy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\cudart*.dll" "D:\Workspace\Advanced Multicore Systems\AMS\Lav3\BrainLenovo\Debug\"
+         :VCEnd
+         copy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\cudart*.dll" "D:\Workspace\Advanced Multicore Systems\AMS\Lav3\BrainLenovo\Debug\"
+         C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\cudart32_70.dll
+         C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin\cudart64_70.dll
+                 2 file(s) copied.
+       FinalizeBuildStatus:
+         Deleting file "Debug\BrainLenovo.unsuccessfulbuild".
+         Touching "Debug\BrainLenovo.lastbuildstate".
+     1>Done Building Project "D:\Workspace\Advanced Multicore Systems\AMS\Lav3\BrainLenovo\BrainLenovo\BrainLenovo.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:04.13
