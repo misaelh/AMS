@@ -29,19 +29,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <sys/time.h>
+//#include <sys/time.h>
 #include <time.h>
 #include "infoli.h"
 #include <cuda_runtime.h>
 
 	typedef unsigned long long timestamp_t;
 
-	static timestamp_t get_timestamp ()
-	{
-		struct timeval now;
-		gettimeofday (&now, NULL);
-		return  now.tv_usec + (timestamp_t)now.tv_sec * 1000000;
-	}
+	//static timestamp_t get_timestamp ()
+	//{
+	//	struct timeval now;
+	//	gettimeofday (&now, NULL);
+	//	return  now.tv_usec + (timestamp_t)now.tv_sec * 1000000;
+	//}
 	
 	//This is function declaration for device's side
 	__global__ void neighbor_kernel(double *cellStatePtr, double *cellVDendPtr) ;
@@ -101,7 +101,7 @@ int main(int argc, char *argv[]){
     FILE *pOutFile;
     char temp[100];//warning: this buffer may overflow
     int inputFromFile = 0;
-    int debug=0, print=0;
+    int debug=1, print=1;
     timestamp_t t0, t1, t2, t3, t4, t5, secs;
     cudaEvent_t start, stop;
     float time;
@@ -267,13 +267,13 @@ int main(int argc, char *argv[]){
     cudaFuncSetCacheConfig(compute_kernel, cudaFuncCachePreferL1);	
 
     if (debug)
-        printf("Transferring data to device's side.\n");	
-    t0 = get_timestamp();
+        //printf("Transferring data to device's side.\n");	
+    //t0 = get_timestamp();
     checkCudaErrors(cudaMemcpy( dev_iApp, iApp, simSteps*sizeof(double), cudaMemcpyHostToDevice) );
     checkCudaErrors(cudaMemcpy( dev_cellStatePtr, cellStatePtr, IO_NETWORK_DIM1*IO_NETWORK_DIM2*PARAM_SIZE*sizeof(double), cudaMemcpyHostToDevice) );
     checkCudaErrors(cudaMemcpy( dev_cellVDendPtr, cellVDendPtr, IO_NETWORK_DIM1*IO_NETWORK_DIM2*sizeof(double), cudaMemcpyHostToDevice) );
     checkCudaErrors(cudaBindTexture2D(NULL, t_cellVDendPtr, dev_cellVDendPtr,  desc, IO_NETWORK_DIM1, IO_NETWORK_DIM2, IO_NETWORK_DIM1*sizeof(double)));
-    t1 = get_timestamp();
+    //t1 = get_timestamp();
 
 	
     if (debug)
@@ -286,13 +286,13 @@ int main(int argc, char *argv[]){
             fputs(temp, pOutFile);
 		}
 		s = i%5;
-		t4 = get_timestamp();
+		//t4 = get_timestamp();
 		neighbor_kernel <<< gridDim, blockDim, 0, stream[s] >>>(dev_cellStatePtr, dev_cellVDendPtr);
 		compute_kernel <<< gridDim, blockDim, 0, stream[s] >>>(dev_cellStatePtr, dev_iApp, dev_cellVDendPtr);
-		t5 = get_timestamp();
+		//t5 = get_timestamp();
 		
 		if (debug)
-		    printf("Transferring results to host.\n");
+		    //printf("Transferring results to host.\n");
 		checkCudaErrors(cudaMemcpyAsync( cellStatePtr, dev_cellStatePtr, IO_NETWORK_DIM1*IO_NETWORK_DIM2*PARAM_SIZE*sizeof(double), cudaMemcpyDeviceToHost, stream[s]) );
 		if (debug) {		
         	b=0;
@@ -311,33 +311,33 @@ int main(int argc, char *argv[]){
         sprintf(temp, "\n");
         fputs(temp, pOutFile);
     }
-    t2 = get_timestamp();
+    //t2 = get_timestamp();
 	
     //if (debug)
     	//printf("Transferring results to host.\n");
     //checkCudaErrors(cudaMemcpy( cellStatePtr, dev_cellStatePtr, IO_NETWORK_DIM1*IO_NETWORK_DIM2*PARAM_SIZE*sizeof(double), cudaMemcpyDeviceToHost) );
-    t3 = get_timestamp();
+    //t3 = get_timestamp();
     
 	if (debug) {
     	printf("BlockDim x=%d, y=%d, GridDim x=%d, y=%d \n", blockDim.x, blockDim.y, IO_NETWORK_DIM1/blockDim.x, IO_NETWORK_DIM2/blockDim.y);
         printf("%d ms of brain time in %d simulation steps\n", SIMTIME, 120000);
-        secs = (t3 - t0);
-        printf("%lld us real time \n", secs);
-        cudaEventElapsedTime(&time, start, stop);
-        secs = (t2 - t1);
-        printf(" %f us kernel time: \n", time*1000);
-        printf(" %lld us kernel time \n", secs);
-        secs = (t5 - t4);
-        printf("   %lld us compute time per timestep to device time \n", secs);
-        secs = (t1 - t0);
-        printf(" %lld us xfer to device time \n", secs);
-        secs = (t3 - t2);
-        printf(" %lld us xfer to host time cellState \n", secs);
+        //secs = (t3 - t0);
+        //printf("%lld us real time \n", secs);
+        //cudaEventElapsedTime(&time, start, stop);
+        //secs = (t2 - t1);
+        //printf(" %f us kernel time: \n", time*1000);
+        //printf(" %lld us kernel time \n", secs);
+        //secs = (t5 - t4);
+        //printf("   %lld us compute time per timestep to device time \n", secs);
+        //secs = (t1 - t0);
+        //printf(" %lld us xfer to device time \n", secs);
+        //secs = (t3 - t2);
+        //printf(" %lld us xfer to host time cellState \n", secs);
     }
     if (print) {
         printf("%d ms of brain time in %d simulation steps\n", SIMTIME, 120000);
-        secs = (t3 - t0);
-        printf("%lld us real time \n", secs);
+        //secs = (t3 - t0);
+        //printf("%lld us real time \n", secs);
     }
 
     //Free up memory and close files
