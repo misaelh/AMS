@@ -44,7 +44,7 @@
 	//}
 	
 	//This is function declaration for device's side
-	__global__ void neighbor_kernel(double *cellStatePtr, double *iApp, double *cellVDendPtr) ;
+	__global__ void neighbor_kernel(double *cellStatePtr, double *cellVDendPtr) ;
 	__global__ void compute_kernel(double *cellStatePtr, double *iApp, double *cellVDendPtr) ;
 	__device__ int dev_fetch(int j, int k) ;
 	__device__ void dev_CompDend(double *cellCompParamsPtr);
@@ -92,6 +92,7 @@
             exit(-1);
         }
     }
+
 
 int main(int argc, char *argv[]){
     char *inFileName;
@@ -286,7 +287,7 @@ int main(int argc, char *argv[]){
 		}
 		s = i%5;
 		//t4 = get_timestamp();
-		neighbor_kernel <<< gridDim, blockDim, 0, stream[s] >>>(dev_cellStatePtr, dev_iApp, dev_cellVDendPtr);
+		neighbor_kernel <<< gridDim, blockDim, 0, stream[s] >>>(dev_cellStatePtr, dev_cellVDendPtr);
 		compute_kernel <<< gridDim, blockDim, 0, stream[s] >>>(dev_cellStatePtr, dev_iApp, dev_cellVDendPtr);
 		//t5 = get_timestamp();
 		
@@ -358,38 +359,42 @@ int main(int argc, char *argv[]){
     return EXIT_SUCCESS;
 }
 
-__global__ void neighbor_kernel(double *cellStatePtr, double *iApp, double *cellVDendPtr) {
+__global__ void neighbor_kernel(double *cellStatePtr, double *cellVDendPtr) {
 
 	//int d_simTime, d_simSteps, d_i, k, j, p, q, n = 0, e;
-	int j, k, d_i, e;
-	double d_cellCompParams[LOCAL_PARAM_SIZE];
+	int j, k, n, p, q;
+	//double d_cellCompParams[SIZEOFCOMPPARAM];
 	
 	k = blockIdx.x*blockDim.x + threadIdx.x;
 	j = blockIdx.y*blockDim.y + threadIdx.y;
 	
 	//Get neighbor V_dend
-/* 	n = 0;
-#ifdef USE_THEIR_CODE
+	n = 0;
 	for(p=j-1;p<=j+1;p++){
 	    for(q=k-1;q<=k+1;q++){
+		//cellStatePtr[j*IO_NETWORK_DIM2*PARAM_SIZE + k*PARAM_SIZE + (n)] = fetch_double(t_cellVDendPtr, j, k);
+		//if (((p!=j)||(q!=k)) && (p>=0)&&(q>=0) && (p<IO_NETWORK_DIM1)&&(q<IO_NETWORK_DIM2)){ 
 		  cellStatePtr[dev_fetch(j,k) + (n++)] = fetch_double(t_cellVDendPtr, p, q);
+		  //cellStatePtr[j*IO_NETWORK_DIM1*PARAM_SIZE + k*PARAM_SIZE + (n++)] = fetch_double(t_cellVDendPtr, p, q);
+		//}	    
 		if(p==j && q==k) n=n-1;
+		//n=n+1;
 	    }	
 	}
-#else */
-	int jmin = j-1, jplus=j+1, kmin = k-1, kplus=k+1, n=0;
-	
-	cellStatePtr[dev_fetch(j,k) + (n++)] = fetch_double(t_cellVDendPtr, jmin, kmin);
-	cellStatePtr[dev_fetch(j,k) + (n++)] = fetch_double(t_cellVDendPtr, jmin, k);
-	cellStatePtr[dev_fetch(j,k) + (n++)] = fetch_double(t_cellVDendPtr, jmin, kplus);
-	cellStatePtr[dev_fetch(j,k) + (n++)] = fetch_double(t_cellVDendPtr, j, kmin);
-	// REMOVED problem
-	cellStatePtr[dev_fetch(j,k) + (n++)] = fetch_double(t_cellVDendPtr, j, kplus);
-	cellStatePtr[dev_fetch(j,k) + (n++)] = fetch_double(t_cellVDendPtr, jplus, kmin);
-	cellStatePtr[dev_fetch(j,k) + (n++)] = fetch_double(t_cellVDendPtr, jplus, k);
-	cellStatePtr[dev_fetch(j,k) + (n++)] = fetch_double(t_cellVDendPtr, jplus, kplus);
 	__syncthreads();
-		d_i=g_i;  
+	return;
+}
+
+__global__ void compute_kernel(double *cellStatePtr, double *iApp, double *cellVDendPtr) {
+
+	int j, k, e, d_i;
+	double d_cellCompParams[LOCAL_PARAM_SIZE];
+	
+	k = blockIdx.x*blockDim.x + threadIdx.x;
+	j = blockIdx.y*blockDim.y + threadIdx.y;
+	
+	//Compute one by one sim step
+	    d_i=g_i;  
 	    d_cellCompParams[0] = iApp[d_i];
 	    #pragma unroll 8
 	    for (e = 0; e < STATEADD; e++){
@@ -408,18 +413,6 @@ __global__ void neighbor_kernel(double *cellStatePtr, double *iApp, double *cell
 	    dev_CompAxon(d_cellCompParams); 
 	    //updates
 	    __syncthreads();
-	return;
-}
-
-__global__ void compute_kernel(double *cellStatePtr, double *iApp, double *cellVDendPtr) {
-
-	int j, k, e;
-	double d_cellCompParams[LOCAL_PARAM_SIZE];
-	
-	k = blockIdx.x*blockDim.x + threadIdx.x;
-	j = blockIdx.y*blockDim.y + threadIdx.y;
-	
-	//Compute one by one sim step
 	    #pragma unroll 19
 	    for (e = 0; e < STATE_SIZE; e++){
 		cellStatePtr[dev_fetch(j,k) + STATEADD + e] = d_cellCompParams[NEXTSTATESTARTADD + e];

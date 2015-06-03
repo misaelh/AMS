@@ -30,10 +30,10 @@
 #define MAIN_H_
 /*** MACROS ***/
 #define RAND_INIT 0 // make it zero to facilitate debugging
-#define SIMTIME 60 // in ms, for when no input file is provided
+#define SIMTIME 600 // in ms, for when no input file is provided
 //IO network size is IO_NETWORK_DIM1*IO_NETWORK_DIM2
-#define IO_NETWORK_DIM1 256
-#define IO_NETWORK_DIM2 256
+#define IO_NETWORK_DIM1 16
+#define IO_NETWORK_DIM2 16
 #define IO_NETWORK_SIZE IO_NETWORK_DIM1*IO_NETWORK_DIM2
 
 #define IAPP_MAX_CHARS 6 //2 integer, the dot, 2 decimals and the delimiter
@@ -74,8 +74,8 @@
 /*** TYPEDEFS AND STRUCTS***/
 //typedef double mod_prec;
 //typedef float mod_prec;
-#define BLOCKSIZEX 32
-#define BLOCKSIZEY 32
+#define BLOCKSIZEX 4
+#define BLOCKSIZEY 8
 
 #define STATE_SIZE 19
 //#define CELL_STATE_SIZE 27
